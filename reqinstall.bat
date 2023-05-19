@@ -1,4 +1,5 @@
 @echo off
+::Thx KDot
 cd /d "%~dp0"
 
 color 0a
