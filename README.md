@@ -4,7 +4,7 @@ Python script to Encrypt or Decrypt your input using a password to encrypt
 # Usage
 
 ```python
-import './AES'
+import './AES' # Put the path to the AES.py file here.
 
 Encrypted_String, iv, key = AES.encrypt('Message', 'Supper Secure Pasword', 100, 32)
 
