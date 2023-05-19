@@ -14,12 +14,6 @@ if not %errorlevel% == 0 (
     exit /b 1
 )
 
-if "%~1"=="" (
-    python -m pip install -r requirements.txt
-    pause
-) else (
-    python -m pip install -r requirements.txt
-    pause
-)
+python -m pip install -r requirements.txt
 
 exit /b 0
