@@ -6,7 +6,7 @@ Python script to Encrypt or Decrypt your input using a password to encrypt
 ```python
 import './AES'
 
-Encrypted_String, iv, key = AES.encrypt("Message', 'Supper Secure Pasword', 100, 32)
+Encrypted_String, iv, key = AES.encrypt('Message', 'Supper Secure Pasword', 100, 32)
 
 # Fun fact
 # You dont need to parse ANYTHING apart for a message for this to work!
