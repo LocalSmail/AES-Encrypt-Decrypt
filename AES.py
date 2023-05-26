@@ -1,35 +1,40 @@
-import os
-import pyaes
+import bson
 import pbkdf2
-import secrets
+import base64
+
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+from secrets import token_bytes
 
-def encrypt(message: str, password: str = 'password', passwordSalt: int = 100, keysize: int = 32):
-    passwordSalt = os.urandom(passwordSalt) # generate salt
-    key = pbkdf2.PBKDF2(password, passwordSalt).read(keysize) # generate key using salt and using the password given then reading the amount of characters for the key via keysize
-    iv = bytes(pyaes.Counter(secrets.randbits(256))._counter).hex().encode('utf-8') # generate IV which is 256 bits then hex it and encode it
-    
-    # Create new AES object to Encrypt
-    cipher = AES.new(key, AES.MODE_CBC, bytes.fromhex(iv.decode('utf-8')))
-    
-    # Padding
-    msg = pad(message.encode('utf-8'), AES.block_size)
-    
-    # Encrypt
-    encrypted = cipher.encrypt(msg)
-    
-    return encrypted, iv, key # Return the encrypted message, geenrated IV aswell as the generated KEY. ALL needed to decrypt.
+MODE_AES_256 = 32
+MODE_AES_128 = 16
 
-def decrypt(message: bytes, iv: bytes, key: bytes):
-  
-    # Create new AES object to decrypt
-    cipher = AES.new(key, AES.MODE_CBC, bytes.fromhex(iv.decode('utf-8')))
+def encrypt(message: str, password: str, mode:int = MODE_AES_256):
+    salt = token_bytes(32)
+    key = pbkdf2.PBKDF2(password, salt, iterations=2000).read(mode)
+
+    cipher = AES.new(key, AES.MODE_GCM, nonce=token_bytes(16))
+    ciphertext, tag = cipher.encrypt_and_digest(message.encode())
+    nonce = cipher.nonce
     
-    # Decrypt
-    decrypted_message = cipher.decrypt(message)
+    return base64.urlsafe_b64encode(bson.dumps({"": [salt, nonce, tag, ciphertext]})).decode()
 
-    # Unpad message
-    unpadded_message = unpad(decrypted_message, AES.block_size) # b'\t\t\tMessage' -> b'Message'
+def decrypt(encrypted_message: str, password:str, mode:int = MODE_AES_256):
+    encrypted_message = bson.loads(base64.urlsafe_b64decode(encrypted_message.encode()))[""]
+    salt, nonce, tag, ciphertext = encrypted_message
 
-    return unpadded_message # Returns Decrpyted message as bytes
+    key = pbkdf2.PBKDF2(password, salt, iterations=2000).read(mode)
+
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    plaintext = cipher.decrypt_and_verify(ciphertext, tag).decode()
+
+    return plaintext
+
+def perform_test():
+    password = base64.urlsafe_b64encode(token_bytes(24)).decode()
+    message = base64.urlsafe_b64encode(token_bytes(40)).decode()
+    
+    if decrypt(encrypt(message, password, MODE_AES_256), password, MODE_AES_256) != message or \
+    decrypt(encrypt(message, password, MODE_AES_128), password, MODE_AES_128) != message:
+        return False
+    
+    return True
