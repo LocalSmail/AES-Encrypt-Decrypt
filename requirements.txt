@@ -1,3 +1,3 @@
-pycryptodome
+pyaes
+Crypto
 pbkdf2
-bson
