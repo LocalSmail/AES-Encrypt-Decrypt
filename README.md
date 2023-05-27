@@ -4,13 +4,15 @@ Python script to Encrypt or Decrypt your input using a password to encrypt
 # Usage
 
 ```python
-import './AES' 
-# Put the path to the AES.py file here, this will work if it is in the same directory as your script
+import './AES' # Put the path to the AES.py file here.
 
-Decrypted = AES.encrypt("My super secret message!", "My super secure password!", MODE_AES_256)
-Decrypted = AES.decrypt(ciphertext, "My super secure password!", MODE_AES_256)
+Encrypted_String, iv, key = AES.encrypt('Message', 'Supper Secure Pasword', 100, 32)
 
-print("[+] Ciphertext: " + Decrypted)
-print("[+] Plaintext: " + Decrypted)
-print("Woah, look at how easy it is to use my amazing code!")
+# Fun fact
+# You dont need to parse ANYTHING apart for a message for this to work!
+# Encrypted_String, iv, key = AES.encrypt("Message') # You can just do this!
+                                        
+Decrypted_String = AES.decrypt(Encrypted_String, iv, key)
+
+print(f'Encrypted String: {Encrypted_String}\nDecrypted String: {Decrypted_String}\nVery Easy!')
 ```
