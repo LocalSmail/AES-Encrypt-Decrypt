@@ -1,6 +1,10 @@
 # AES-Encrypt-Decrypt
 Python script to Encrypt or Decrypt your input using a password to encrypt
 
+## Discord
+
+Join here: https://discord.com/Rj7u8Qmvsa
+
 # Usage
 
 ```python
