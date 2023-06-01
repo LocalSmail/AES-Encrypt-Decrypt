@@ -7,6 +7,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 def encrypt(message: str, password: str = 'password', passwordSalt: int = 100, keysize: int = 32):
+    
     passwordSalt = os.urandom(passwordSalt) # generate salt
     key = pbkdf2.PBKDF2(password, passwordSalt).read(keysize) # generate key using salt and using the password given then reading the amount of characters for the key via keysize
     iv = bytes(pyaes.Counter(secrets.randbits(256))._counter).hex().encode('utf-8') # generate IV which is 256 bits then hex it and encode it
@@ -33,4 +34,4 @@ def decrypt(message: bytes, iv: bytes, key: bytes):
     # Unpad message
     unpadded_message = unpad(decrypted_message, AES.block_size) # b'\t\t\tMessage' -> b'Message'
 
-    return unpadded_message # Returns Decrpyted message as bytes
+    return str(unpadded_message) # Returns Decrpyted message as string from bytes | b'Message' -> 'Message'
